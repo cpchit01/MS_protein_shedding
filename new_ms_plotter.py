@@ -142,12 +142,14 @@ def plot_compartments_vs_time(parameters, results):
     n = parameters['n']
     q = np.shape(compartments)[0]
     x = np.linspace(0, q - 1, num=q)
+    plt.title('Oligodendrocyte Compartments')
 
     for i in range(0, n):
         label_text = 'Compartment #' + str(i + 1)
+        plt.subplot(5, 1, i+1)
         plt.plot(x, compartments[:, i], label=label_text)
-    plt.title('Oligodendrocyte Compartments')
-    plt.legend()
+        plt.legend()
+    
     plt.savefig('compartments/oligodendrocyte_compartments_vs_time.png', bbox_inches='tight')
     plt.show()
 
@@ -158,11 +160,13 @@ def plot_compartments_vs_time(parameters, results):
 
     q = np.shape(N_compartments)[0]
     x = np.linspace(0, q - 1, num=q)
+    plt.title('Neuron Compartments')
     for i in range(0, n):
         label_text = 'Compartment #' + str(i + 1)
+        plt.subplot(5, 1, i+1)
         plt.plot(x, N_compartments[:, i], label=label_text)
-    plt.title('Neuron Compartments')
-    plt.legend()
+        plt.legend()
+
     plt.savefig('compartments/neuron_compartments_vs_time.png', bbox_inches='tight')
     plt.show()
 
