@@ -121,6 +121,8 @@ def plot_overall_stress(overall_stress, stress_type, remission_type, n, t0, tmax
     for i in range(n + 1):
         y = i * (100 / n)
         plt.axhline(y=y, color='r', linestyle='dotted')
+    stripped_title = overall_title_str.replace(' ', '') + '.png'
+    plt.savefig(stripped_title, bbox_inches='tight')
 
     plt.show()
 
@@ -142,14 +144,14 @@ def plot_compartments_vs_time(parameters, results):
     n = parameters['n']
     q = np.shape(compartments)[0]
     x = np.linspace(0, q - 1, num=q)
-    plt.title('Oligodendrocyte Compartments')
+    plt.suptitle('Oligodendrocyte Compartments')
 
     for i in range(0, n):
         label_text = 'Compartment #' + str(i + 1)
         plt.subplot(5, 1, i+1)
         plt.plot(x, compartments[:, i], label=label_text)
         plt.legend()
-    
+
     plt.savefig('compartments/oligodendrocyte_compartments_vs_time.png', bbox_inches='tight')
     plt.show()
 
@@ -160,7 +162,8 @@ def plot_compartments_vs_time(parameters, results):
 
     q = np.shape(N_compartments)[0]
     x = np.linspace(0, q - 1, num=q)
-    plt.title('Neuron Compartments')
+    plt.suptitle('Neuron Compartments')
+
     for i in range(0, n):
         label_text = 'Compartment #' + str(i + 1)
         plt.subplot(5, 1, i+1)
@@ -214,9 +217,11 @@ def plot_alive_dead_vs_time(parameters, results):
     plt.show()
 
     plt.figure(2)
-    L_deaths = results['L_deaths']
-    L_births = results['L_births']
-    N_deaths = results['N_deaths']
+    IC_N = parameters['IC_N']
+    IC_L = parameters['IC_L']
+    L_deaths = results['L_deaths'] / IC_L
+    L_births = results['L_births'] / IC_L
+    N_deaths = results['N_deaths'] / IC_N
 
     if len(L_deaths) != len(L_births) != len(N_deaths):
         print('Error: Olg. Birth and Death Array Sizes do not match')
@@ -345,65 +350,96 @@ def plot_protein_shedding(parameters, results):
     total_cleared_N = cleared_N_ec + cleared_N_nec
     total_cleared = total_cleared_N + total_cleared_L
 
+
+
     x = np.linspace(1, maxIter+1, num=maxIter+1)
 
     # EC vs NEC vs total in plasma vs time
     plt.figure(0)
+    plt.subplot(2, 1, 1)
     plt.plot(x, total_prot, label='Total Protein')
+    plt.legend()
+    plt.subplot(2, 1, 2)
     plt.plot(x, total_nec_prot, label='NEC Protein')
     plt.plot(x, total_ec_prot, label='EC Protein')
     plt.legend()
-    plt.title('Type of Protein in Plasma vs Time')
+    plt.suptitle('Type of Protein in Plasma vs Time')
     plt.savefig('protein shedding analyses/NEC_EC_Total_vs_time.png', bbox_inches='tight')
     plt.show()
 
+    results.update(total_nec_prot=total_nec_prot)
+    results.update(total_ec_prot=total_ec_prot)
+    results.update(total_prot=total_prot)
+
     # L vs N vs total in plasma vs time
     plt.figure(1)
+    plt.subplot(2, 1, 1)
     plt.plot(x, total_prot, label='Total Protein')
+    plt.legend()
+    plt.subplot(2, 1, 2)
     plt.plot(x, total_L_prot, label='Oligodendrocyte Protein')
     plt.plot(x, total_N_prot, label='Neuron Protein')
     plt.legend()
-    plt.title('Source of Protein in plasma vs Time')
+    plt.suptitle('Source of Protein in plasma vs Time')
     plt.savefig('protein shedding analyses/L_N_Total_vs_time.png', bbox_inches='tight')
     plt.show()
 
+    results.update(total_L_prot=total_L_prot)
+    results.update(total_N_prot=total_N_prot)
+
     # L only
-    plt.figure(2)
-    plt.plot(x, total_L_prot, label='Total Oligodendrocyte Protein')
-    plt.plot(x, current_L_ec, label='Oligodendrocyte EC Protein')
-    plt.plot(x, current_L_nec, label='Oligodendrocyte NEC Protein')
-    plt.legend()
-    plt.title('Type of Oligodendrocyte Protein vs Time')
-    plt.savefig('protein shedding analyses/LEC_LNEC_vs_time.png', bbox_inches='tight')
-    plt.show()
+    # plot doesn't yield much valuable data
+
+    # plt.figure(2)
+    # plt.subplot(2, 1, 1)
+    # plt.plot(x, total_L_prot, label='Total Oligodendrocyte Protein')
+    # plt.legend()
+    # plt.subplot(2, 1, 2)
+    # plt.plot(x, current_L_ec, label='Oligodendrocyte EC Protein')
+    # plt.plot(x, current_L_nec, label='Oligodendrocyte NEC Protein')
+    # plt.legend()
+    # plt.suptitle('Type of Oligodendrocyte Protein vs Time')
+    # plt.savefig('protein shedding analyses/LEC_LNEC_vs_time.png', bbox_inches='tight')
+    # plt.show()
 
     # N only
-    plt.figure(3)
-    plt.plot(x, total_N_prot, label='Total Neuron Protein')
-    plt.plot(x, current_N_ec, label='Neuron EC Protein')
-    plt.plot(x, current_N_nec, label='Neuron NEC Protein')
-    plt.legend()
-    plt.title('Type of Neuron Protein vs time')
-    plt.savefig('protein shedding analyses/NEC_NNEC_vs_time.png', bbox_inches='tight')
-    plt.show()
+    # plot doesn't yield much valuable data
+
+    # plt.figure(3)
+    # plt.subplot(2, 1, 1)
+    # plt.plot(x, total_N_prot, label='Total Neuron Protein')
+    # plt.legend()
+    # plt.subplot(2, 1, 2)
+    # plt.plot(x, current_N_ec, label='Neuron EC Protein')
+    # plt.plot(x, current_N_nec, label='Neuron NEC Protein')
+    # plt.legend()
+    # plt.suptitle('Type of Neuron Protein vs time')
+    # plt.savefig('protein shedding analyses/NEC_NNEC_vs_time.png', bbox_inches='tight')
+    # plt.show()
 
     # EC only
     plt.figure(4)
+    plt.subplot(2, 1, 1)
     plt.plot(x, total_ec_prot, label='Total EC Protein')
+    plt.legend()
+    plt.subplot(2, 1, 2)
     plt.plot(x, current_N_ec, label='Neuron EC Protein')
     plt.plot(x, current_L_ec, label='Oligodendrocyte EC Protein')
     plt.legend()
-    plt.title('Source of EC Protein vs Time')
+    plt.suptitle('Source of EC Protein vs Time')
     plt.savefig('protein shedding analyses/NEC_LEC_vs_time.png', bbox_inches='tight')
     plt.show()
 
     # NEC only
     plt.figure(5)
+    plt.subplot(2, 1, 1)
     plt.plot(x, total_nec_prot, label='Total NEC Protein')
+    plt.legend()
+    plt.subplot(2, 1, 2)
     plt.plot(x, current_N_nec, label='Neuron NEC Protein')
     plt.plot(x, current_L_nec, label='Oligodendrocyte NEC Protein')
     plt.legend()
-    plt.title('Source of NEC Protein vs Time')
+    plt.suptitle('Source of NEC Protein vs Time')
     plt.savefig('protein shedding analyses/NNEC_LNEC_vs_time.png', bbox_inches='tight')
     plt.show()
 
